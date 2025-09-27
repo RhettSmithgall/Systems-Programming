@@ -1,19 +1,25 @@
 #include "headers.h"
 
-/*
-Symbols
-1. Symbols cannot be defined with a name which matches an assembler directive -> taken care of somewhere else
-2. Symbols must start with an alpha character [A-Z]
-3. Symbols cannot be longer than six characters
-4. Symbols cannot contain spaces, $, !, =, +, - , (, ), or@
-*/
+// Forbidden characters
+const char forbidden[] = ",$!=+-()@";
 
 int isValidSymbolName(char* token) {
-    while(*token != '\0'){
-        if(!isalpha(*token)){
+    // Check if first character is A-Z
+    if (!isalpha(token[0])) {
+        return 0;
+    }
+
+    // Check length <= 6
+    if (strlen(token) > 6) {
+        return 0;
+    }
+
+    // Check for forbidden characters
+    for (int i = 0; token[i] != '\0'; i++) {
+        if (strchr(forbidden, token[i]) != NULL) {
             return 0;
         }
-        token++;
     }
-    return 1; 
+
+    return 1;
 }

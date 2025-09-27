@@ -20,7 +20,7 @@ echo ----------------------------------------------------------------
 echo Testing case 3  SIC Program Has Invalid Hex Constant  
 ./project1 test3.sic
 echo ----------------------------------------------------------------
-echo Testing case 4  SIC Program HasSymbol Name that is an assembler Directive BYTE 
+echo Testing case 4  SIC Program Has Symbol Name that is an assembler Directive BYTE 
 ./project1 test4.sic
 echo ----------------------------------------------------------------
 echo Testing case 5  SIC Program Starts at Hex 8000. No room left in SIC memory.   
