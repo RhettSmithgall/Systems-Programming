@@ -20,7 +20,7 @@ int main( int argc, char* argv[]){
 
     int lineCount = 0;    
     int address = 0x0; 
-    char* operand[10];
+    char* token;
     
     //line counter
 	while( fgets(line, 1023, fp) != NULL   ){       //read the file line by line
@@ -36,7 +36,7 @@ int main( int argc, char* argv[]){
             return -1;
         }
 
-        char* token = strtok(line, " \n\t\r");      //tokenize the line
+        token = strtok(line, " \n\t\r");      //tokenize the line
 
         if(isDirective(token)) {     
             lineCount++;
@@ -50,6 +50,11 @@ int main( int argc, char* argv[]){
                            
         if(symbolExists(SYMTAB, token)) {     
             printf("Error: Symbol %s at line %d was already defined\n", token, lineCount);
+            return -1;
+        }
+
+        if(!isValidSymbolName(token)){
+            printf("Error: invalid symbol name %s at line %d\n", token, lineCount);
             return -1;
         }
 
@@ -71,19 +76,24 @@ int main( int argc, char* argv[]){
             if(strcmp(token, "BYTE") == 0) {       
                 token = strtok(NULL, " \n\t\r");   
                 if(token[0] == 'C') {            
-                    sscanf(token, "C'%[^']'", operand); //remove C'__'
+                    sscanf(token, "C'%[^']'", token); //remove C'__'
                     if(strlen(token) > 3){
-                        printf("ERROR: Constant exceeds 24 bits at line %d\n",token,lineCount);
+                        printf("ERROR: Constant %s exceeds 24 bits at line %d\n",token,lineCount);
                         fclose(fp);
                         return -1;
                     }
                     address += strlen(token);
                 }
-                else if(token[0] == 'X') if(token[0] == 'X') {     
-                    sscanf(token, "X'%[^']'", operand); //remove X'__'
+                else if(token[0] == 'X'){    
+                    sscanf(token, "X'%[^']'", token); //remove X'__'
                     if (!(isValidHex(token))) //valid hex characters
                     {
-                        printf("ERROR: invalid hex '%s' at line %d\n",token,lineCount);
+                        printf("ERROR: invalid hex %s at line %d\n",token,lineCount);
+                        fclose(fp);
+                        return -1;
+                    }
+                    if(strtol(token, NULL, 16) > 0x7FFFFF){
+                        printf("ERROR: Constant %s exceeds 24 bits at line %d\n",token,lineCount);
                         fclose(fp);
                         return -1;
                     }
@@ -92,7 +102,13 @@ int main( int argc, char* argv[]){
                 continue;
             }
 
-            if(strcmp(token, "WORD") == 0) {       
+            if(strcmp(token, "WORD") == 0) {  
+                token = strtok(NULL, " \n\t\r");  
+                if(atoi(token) > 0x7FFFFF){
+                    printf("ERROR: Constant %s exceeds 24 bits at line %d\n",token,lineCount);
+                    fclose(fp);
+                    return -1;
+                }     
                 address += 3; 
                 continue;
             }

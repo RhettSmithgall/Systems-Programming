@@ -11,6 +11,7 @@ struct symbol {
 	struct symbol *next;
 	};
 
+int isValidSymbolName(char* token);
 void printSymbols(struct symbol* table);
 void destroySymbolTable(struct symbol* head);
 int symbolExists( struct symbol* table, char* token);
