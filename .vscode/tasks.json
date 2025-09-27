@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build All C Files",
+      "type": "shell",
+      "command": "gcc",
+      "args": [
+        "main.c",
+        "insertSymbol.c",
+        "destroySymbolTable.c",
+        "printSymbol.c",
+        "symbolExists.c",
+        "isValidHex.c",
+        "isOpcode.c",
+        "isDirective.c",
+        "createSymbol.c",
+        "-o",
+        "main.exe"
+      ],
+    "options": {
+        "cwd": "${workspaceFolder}/project1"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    }
+  ]
+}

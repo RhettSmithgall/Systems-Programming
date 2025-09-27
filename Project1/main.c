@@ -20,6 +20,7 @@ int main( int argc, char* argv[]){
 
     int lineCount = 0;    
     int address = 0x0; 
+    char* operand[10];
     
     //line counter
 	while( fgets(line, 1023, fp) != NULL   ){       //read the file line by line
@@ -70,17 +71,16 @@ int main( int argc, char* argv[]){
             if(strcmp(token, "BYTE") == 0) {       
                 token = strtok(NULL, " \n\t\r");   
                 if(token[0] == 'C') {            
-                    sscanf(token, "C'%[^']'", token); //remove C'__'
-                    if (isValidHex(token)) //valid hex characters
-                    {
-                        printf("ERROR: invalid hex '%s' at line %d",token,lineCount);
+                    sscanf(token, "C'%[^']'", operand); //remove C'__'
+                    if(strlen(token) > 3){
+                        printf("ERROR: Constant exceeds 24 bits at line %d\n",token,lineCount);
                         fclose(fp);
                         return -1;
                     }
                     address += strlen(token);
                 }
                 else if(token[0] == 'X') if(token[0] == 'X') {     
-                    sscanf(token, "X'%[^']'", token); //remove X'__'
+                    sscanf(token, "X'%[^']'", operand); //remove X'__'
                     if (!(isValidHex(token))) //valid hex characters
                     {
                         printf("ERROR: invalid hex '%s' at line %d\n",token,lineCount);
@@ -123,7 +123,7 @@ int main( int argc, char* argv[]){
         lineCount++; 
         address += 3;   
     }
-    if(address > 32787){
+    if(address > 0x8000){
         printf("ERROR: Program too large. Max size is 32767 bytes.\n");
         fclose(fp);
         return -1;

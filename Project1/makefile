@@ -1,11 +1,11 @@
-project1: main.o printsymbols.o insertsymbol.o
-	xlc -q64 -o project1 main.o printsymbols.o insertsymbol.o
+CC = gcc
+CFLAGS = -Wall -Wextra
+SOURCES = $(wildcard *.c)
+OBJECTS = $(SOURCES:.c=.o)
+TARGET = myprogram
 
-main.o: main.c headers.h
-	xlc -q64 -c -g main.c
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^
 
-printsymbols.o: printsymbols.c headers.h
-	xlc -q64 -c -g printsymbols.c
-
-insertsymbol.o: insertsymbol.c headers.h
-	xlc -q64 -c -g insertsymbol.c
+clean:
+	rm -f $(TARGET) $(OBJECTS)
