@@ -38,15 +38,15 @@ int main( int argc, char* argv[]){
 
         token = strtok(line, " \n\t\r");      //tokenize the line
 
-        if(isDirective(token)) {     
+        if(isDirective(token) || isOpcode(token)) {     
+            token = strtok(line, " \n\t\r");  
+            if(isDirective(token) || isOpcode(token)) { //this indicates a symbol is named after a directive or opcode (not allowed)
+                printf("Error: Symbol name %s at line %d is a SIC assembly reserved instruction name\n", token, lineCount);
+                return -1;
+            }
             lineCount++;
             continue;
         }          
-            
-        if(isOpcode(token)) { 
-            lineCount++;
-            continue;
-        }
                            
         if(symbolExists(SYMTAB, token)) {     
             printf("Error: Symbol %s at line %d was already defined\n", token, lineCount);
