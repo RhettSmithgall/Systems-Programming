@@ -55,5 +55,32 @@
   "C_Cpp_Runner.useLeakSanitizer": false,
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
-  "C_Cpp_Runner.msvcSecureNoWarnings": false
+  "C_Cpp_Runner.msvcSecureNoWarnings": false,
+  "files.associations": {
+    "**/*.COBOL*{,/*}": "cobol",
+    "**/*.COB*{,/*}": "cobol",
+    "**/*.COBCOPY*{,/*}": "cobol",
+    "**/*.COPYBOOK*{,/*}": "cobol",
+    "**/*.COPY*{,/*}": "cobol",
+    "**/*.PL1*{,/*}": "pl1",
+    "**/*.PLI*{,/*}": "pl1",
+    "**/*.INC*{,/*}": "pl1",
+    "**/*.INCLUDE*{,/*}": "pl1",
+    "**/*.JCL*{,/*}": "jcl",
+    "**/*.CNTL*{,/*}": "jcl",
+    "**/*.PROC*{,/*}": "jcl",
+    "**/*.ASM*{,/*}": "hlasm",
+    "**/*.ASSEMBLE*{,/*}": "hlasm",
+    "**/*.HLASM*{,/*}": "hlasm",
+    "**/*.HLA*{,/*}": "hlasm",
+    "**/*.MACLIB*{,/*}": "hlasm",
+    "**/*.DBD*{,/*}": "hlasm",
+    "**/*.MFS*{,/*}": "hlasm",
+    "**/*.PCB*{,/*}": "hlasm",
+    "**/*.EXEC*{,/*}": "rexx",
+    "**/*.REXX*{,/*}": "rexx",
+    "**/*.REXXINC*{,/*}": "rexx",
+    "*.rex": "rexx",
+    "typeinfo": "c"
+  }
 }

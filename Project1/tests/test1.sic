@@ -2,7 +2,7 @@
 # Example SIC Assembler Program.
 #
 #
-COPY	START	1000		//set address to 1000	
+COPY	START	1000			
 FIRST	STL	RETADR			 
 CLOOP	JSUB	RDREC    		
 	LDA	LENGTH   				
@@ -22,7 +22,7 @@ THREE	WORD	3
 ZERO	WORD	0			
 RETADR	RESW	1			
 LENGTH	RESW	1		
-BUFFER	RESB	4096		//add 1000 hex	
+BUFFER	RESB	4096			
 RDREC	LDX	ZERO   				
 	LDA	ZERO						
 RLOOP	TD	INPUT			
@@ -35,7 +35,7 @@ RLOOP	TD	INPUT
 	JLT	RLOOP				
 EXIT	STX	LENGTH			
 	RSUB							
-INPUT	BYTE	X'F1'	  //add 1 byte		
+INPUT	BYTE	X'F1'	  		
 MAXLEN	WORD	4096													
 WRREC	LDX	ZERO				 
 WLOOP	TD	OUTPUT	
