@@ -3,7 +3,7 @@
 int isValidHex(char *input) {
     for (int i = 0; i < strlen(input); i++) {
         char c = input[i];
-        if (!isxdigit(c)) {  // only 0–9 A–F a–f
+        if (!isxdigit(c)) {  
             return 0;
         }
     }

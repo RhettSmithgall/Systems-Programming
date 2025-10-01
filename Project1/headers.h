@@ -11,6 +11,18 @@ struct symbol {
 	struct symbol *next;
 	};
 
+typedef struct {
+    char* symbol;
+    int symcol;
+    char* instruction;
+    int inscol;
+    char* operand;
+    int opcol;
+} wordStruct;
+
+void getWord(char* readLine,wordStruct* word);
+int isBlank(char* line);
+void error(wordStruct word,char* message,int linenum,int col);
 int isValidSymbolName(char* token);
 void printSymbols(struct symbol* table);
 void destroySymbolTable(struct symbol* head);
