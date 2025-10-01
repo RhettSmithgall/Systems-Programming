@@ -81,6 +81,7 @@
     "**/*.REXX*{,/*}": "rexx",
     "**/*.REXXINC*{,/*}": "rexx",
     "*.rex": "rexx",
-    "typeinfo": "c"
+    "typeinfo": "c",
+    "stdlib.h": "c"
   }
 }

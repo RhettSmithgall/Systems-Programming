@@ -37,100 +37,100 @@ int main( int argc, char* argv[]){
             return -1;
         }
 
-        wordStruct* myword = malloc(sizeof(wordStruct));
-        getWord(readLine,myword);
-        //printf("Symbol:%s\tDirective:%s\tOperand:%s\n",word.symbol,word.instruction,word.operand);
-        wordStruct word = *myword;
+        wordStruct* word = getWord(readLine);
+        //printf("Symbol:%s\tDirective:%s\tOperand:%s\n",word->symbol,word->instruction,word->operand);
 
         //this block checks the symbol token and makes sure it follows the rules
-        if(word.symbol[0] != '\0'){
-            if(symbolExists(SYMTAB, word.symbol)) {   //see if the symbol is already defined  
-                snprintf(msg, sizeof(msg), "Duplicate symbol %s", word.symbol); 
-                error(word,msg,lineNum,word.symcol);
+        if(word->symbol[0] != '\0'){
+            if(symbolExists(SYMTAB, word->symbol)) {   //see if the symbol is already defined  
+            snprintf(msg, sizeof(msg), "Duplicate symbol %s", word->symbol); 
+            error(word,msg,lineNum,word->symcol);
+            fclose(fp);
+            return -1;
+            }
+
+            if(isDirective(word->symbol) || isOpcode(word->symbol)){
+            snprintf(msg, sizeof(msg), "Symbol %s is a SIC assembly reserved instruction name", word->symbol); 
+            error(word,msg,lineNum,word->symcol);
+            fclose(fp);
+            return -1;
+            }
+
+            if (!isalpha(word->symbol[0])) { // Check if first character is A-Z
+            snprintf(msg, sizeof(msg), "Character %c at the begining of symbol %s is not A-Z",word->symbol[0],word->symbol); 
+            error(word,msg,lineNum,word->symcol);
+            fclose(fp);
+            return -1;
+            }
+
+            if (strlen(word->symbol) > 6) { // Check length <= 6
+            snprintf(msg, sizeof(msg), "Symbol %s is longer than 6 characters",word->symbol); 
+            error(word,msg,lineNum,word->symcol);
+            fclose(fp);
+            return -1;
+            }
+
+            for (int i = 0; word->symbol[i] != '\0'; i++) { // Check for forbidden characters
+            if (strchr(",$!=+-()@", word->symbol[i]) != NULL) {
+                snprintf(msg, sizeof(msg), "Invalid character %c in symbol %s",word->symbol[i],word->symbol); 
+                error(word,msg,lineNum,word->symcol+i+1);
                 fclose(fp);
                 return -1;
             }
-
-            if(isDirective(word.symbol) || isOpcode(word.symbol)){
-                snprintf(msg, sizeof(msg), "Symbol %s is a SIC assembly reserved instruction name", word.symbol); 
-                error(word,msg,lineNum,word.symcol);
-                fclose(fp);
-                return -1;
-            }
-
-            if (!isalpha(word.symbol[0])) { // Check if first character is A-Z
-                snprintf(msg, sizeof(msg), "Character %c at the begining of symbol %s is not A-Z",word.symbol[0],word.symbol); 
-                error(word,msg,lineNum,word.symcol);
-                fclose(fp);
-                return -1;
-            }
-
-            if (strlen(word.symbol) > 6) { // Check length <= 6
-                snprintf(msg, sizeof(msg), "Symbol %s is longer than 6 characters",word.symbol); 
-                error(word,msg,lineNum,word.symcol);
-                fclose(fp);
-                return -1;
-            }
-
-            for (int i = 0; word.symbol[i] != '\0'; i++) { // Check for forbidden characters
-                if (strchr(",$!=+-()@", word.symbol[i]) != NULL) {
-                    snprintf(msg, sizeof(msg), "Invalid character %c in symbol %s",word.symbol[i],word.symbol); 
-                    error(word,msg,lineNum,word.symcol+i+1);
-                    fclose(fp);
-                    return -1;
-                }
             }
         }
 
-        if(strcmp(word.instruction, "START") == 0) {      
-            address = strtol(word.operand, NULL, 16);
+        if(strcmp(word->instruction, "START") == 0) {      
+            address = strtol(word->operand, NULL, 16);
         }
 
-        if(word.symbol[0] != '\0'){
-            insertSymbol(&SYMTAB,word.symbol,address,lineNum);
+        if(word->symbol[0] != '\0'){
+            insertSymbol(&SYMTAB,word->symbol,address,lineNum);
         }
 
         //this block validates directives and their operands 
-        if(strcmp(word.instruction, "BYTE") == 0) {   
+        if(strcmp(word->instruction, "BYTE") == 0) {   
             char numbytes[64] = {0};     
-            if(word.operand[0] == 'C') {            
-                sscanf(word.operand, "C'%[^']'", numbytes); //remove C'__'
-                address += strlen(numbytes); 
+            if(word->operand[0] == 'C') {            
+            sscanf(word->operand, "C'%[^']'", numbytes); //remove C'__'
+            address += strlen(numbytes); 
             }
-            else if(word.operand[0] == 'X'){    
-                sscanf(word.operand, "X'%[^']'", numbytes); //remove X'__'
-                if (!(isValidHex(numbytes))) //valid hex characters
-                {
-                    snprintf(msg, sizeof(msg), "Operand %s contains invalid hex characters",word.operand); 
-                    error(word,msg,lineNum,word.opcol);
-                    fclose(fp);
-                    return -1;
-                }
-                address += ceil(strlen(numbytes)/2.0); 
-            }
-        }
-        else if(strcmp(word.instruction, "WORD") == 0) {  
-            if(strtol(word.operand, NULL, 10) > 0x7FFFFF){
-                snprintf(msg, sizeof(msg), "Operand %s exceeds 24 bit word limit",word.operand); 
-                error(word,msg,lineNum,word.opcol);
+            else if(word->operand[0] == 'X'){    
+            sscanf(word->operand, "X'%[^']'", numbytes); //remove X'__'
+            if (!(isValidHex(numbytes))) //valid hex characters
+            {
+                snprintf(msg, sizeof(msg), "Operand %s contains invalid hex characters",word->operand); 
+                error(word,msg,lineNum,word->opcol);
                 fclose(fp);
                 return -1;
+            }
+            address += ceil(strlen(numbytes)/2.0); 
+            }
+        }
+        else if(strcmp(word->instruction, "WORD") == 0) {  
+            if(strtol(word->operand, NULL, 10) > 0x7FFFFF){
+            snprintf(msg, sizeof(msg), "Operand %s exceeds 24 bit word limit",word->operand); 
+            error(word,msg,lineNum,word->opcol);
+            fclose(fp);
+            return -1;
             }     
             address += 3;
         }
-        else if(strcmp(word.instruction, "RESB") == 0) {   
-            address += strtol(word.operand, NULL, 10); 
+        else if(strcmp(word->instruction, "RESB") == 0) {   
+            address += strtol(word->operand, NULL, 10); 
         }
-        else if(strcmp(word.instruction, "RESW") == 0) {        
-            address += 3 * strtol(word.operand, NULL, 10); 
+        else if(strcmp(word->instruction, "RESW") == 0) {        
+            address += 3 * strtol(word->operand, NULL, 10); 
         }
         else{
-            if(strcmp(word.instruction, "START") != 0){
-                address += 3;
+            if(strcmp(word->instruction, "START") != 0){
+            address += 3;
             }
         }
  
         lineNum++;
+        
+       free(word);
     }
     if(address > 0x8000){
         printf("ERROR: Program too large. Max size is 32767 bytes.\n");
@@ -139,6 +139,7 @@ int main( int argc, char* argv[]){
     }
     
     printSymbols(SYMTAB);
+
 }
 
 

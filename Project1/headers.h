@@ -12,17 +12,17 @@ struct symbol {
 	};
 
 typedef struct {
-    char* symbol;
+    char symbol[128];
     int symcol;
-    char* instruction;
+    char instruction[128];
     int inscol;
-    char* operand;
+    char operand[128];
     int opcol;
 } wordStruct;
 
-void getWord(char* readLine,wordStruct* word);
+wordStruct* getWord(char* readLine);
 int isBlank(char* line);
-void error(wordStruct word,char* message,int linenum,int col);
+void error(wordStruct* word,char* message,int linenum,int col);
 int isValidSymbolName(char* token);
 void printSymbols(struct symbol* table);
 void destroySymbolTable(struct symbol* head);
