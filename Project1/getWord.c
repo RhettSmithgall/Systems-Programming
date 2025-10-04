@@ -11,6 +11,26 @@ wordStruct* getWord(char* readLine){
     
     //this very very ugly block of code reads in the line 1 character at a time to perserve column numbers
     while(readLine[colnum] != '\n' && toknum < 3){ //read the line character by character 
+        if(readLine[colnum] == 'C' && readLine[colnum+1] == '\''){
+            //extremely special handling for BYTE C' ' because it can have a space in it
+            buffer[j] = 'C';
+            j++;
+            colnum++;
+            buffer[j] = '\'';
+            j++;
+            colnum++;
+            while(readLine[colnum] != '\''){ //read until \n or '
+                if(readLine[colnum] != '\n'){
+                buffer[j] = readLine[colnum]; 
+                j++;
+                colnum++;}
+                else{
+                    printf("end of line before closing quote");
+                }
+            }
+            continue;
+        }
+        
         if(!isspace(readLine[colnum])){ //if the character isn't whitespace, start loading it into a buffer 
             buffer[j] = readLine[colnum]; 
             j++; 

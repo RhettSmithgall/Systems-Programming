@@ -97,10 +97,11 @@ int main( int argc, char* argv[]){
             }
             else if(word->operand[0] == 'X'){    
             sscanf(word->operand, "X'%[^']'", numbytes); //remove X'__'
-            if (!(isValidHex(numbytes))) //valid hex characters
+            int i = isValidHex(numbytes);
+            if (i > 0) //valid hex characters
             {
-                snprintf(msg, sizeof(msg), "Operand %s contains invalid hex characters",word->operand); 
-                error(word,msg,lineNum,word->opcol);
+                snprintf(msg, sizeof(msg), "Operand %s contains invalid hex character '%c'",word->operand,numbytes[i-1]); 
+                error(word,msg,lineNum,word->opcol + i);
                 fclose(fp);
                 return -1;
             }
