@@ -14,6 +14,8 @@ int main( int argc, char* argv[]){
 		return -1;
 	}
 
+    init_errors();
+
     char msg[1024]; //for errors
     char forbidden[] = ",$!=+-()@"; //for symbol validation
 
@@ -44,21 +46,21 @@ int main( int argc, char* argv[]){
         if(word->symbol[0] != '\0'){
             if(symbolExists(SYMTAB, word->symbol)) {   //see if the symbol is already defined  
             snprintf(msg, sizeof(msg), "Duplicate symbol %s", word->symbol); 
-            error(word,msg,lineNum,word->symcol);
+            addError(word,msg,lineNum,word->symcol);
             fclose(fp);
             return -1;
             }
 
             if(isDirective(word->symbol) || isOpcode(word->symbol)){
             snprintf(msg, sizeof(msg), "Symbol %s is a SIC assembly reserved instruction name", word->symbol); 
-            error(word,msg,lineNum,word->symcol);
+            addError(word,msg,lineNum,word->symcol);
             fclose(fp);
             return -1;
             }
 
             if (!isalpha(word->symbol[0])) { // Check if first character is A-Z
             snprintf(msg, sizeof(msg), "Character %c at the begining of symbol %s is not A-Z",word->symbol[0],word->symbol); 
-            error(word,msg,lineNum,word->symcol);
+            addError(word,msg,lineNum,word->symcol);
             fclose(fp);
             return -1;
             }
@@ -138,6 +140,12 @@ int main( int argc, char* argv[]){
         fclose(fp);
         return -1;
     }
+
+    if(errorCount() > 0){
+        printErrors();
+        return -1;
+    }
+
     
     printSymbols(SYMTAB);
 

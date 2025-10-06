@@ -20,7 +20,21 @@ typedef struct {
     int opcol;
 } wordStruct;
 
+//a struct for individual errors
+typedef struct errorStruct{
+    char msg[256];
+    int lineNum;
+    int colNum;
+    wordStruct word;
+    struct errorStruct *next;
+} error;
+
+
 wordStruct* getWord(char* readLine);
+void addError(wordStruct* word,char* msg,int lineNum,int colNum);
+void printErrors();
+int errorCount();
+void init_errors();
 int isBlank(char* line);
 void error(wordStruct* word,char* message,int linenum,int col);
 int isValidSymbolName(char* token);
