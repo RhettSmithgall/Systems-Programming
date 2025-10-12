@@ -1,6 +1,6 @@
-*.c zos-working-tree-encoding=IBM1047 git-encoding=utf-8
-*.h zos-working-tree-encoding=IBM1047 git-encoding=utf-8
-Makefile zos-working-tree-encoding=IBM1047 git-encoding=utf-8
-.gitattributes zos-working-tree-encoding=iso8859-1
-.gitignore zos-working-tree-encoding=iso8859-1
+*.c working-tree-encoding=IBM1047 git-encoding=utf-8
+*.h working-tree-encoding=IBM1047 git-encoding=utf-8
+Makefile working-tree-encoding=IBM1047 git-encoding=utf-8
+.gitattributes working-tree-encoding=iso8859-1
+.gitignore working-tree-encoding=iso8859-1
 * text=auto eol=lf
