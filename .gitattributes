@@ -1,0 +1,3 @@
+*.c working-tree-encoding=IBM-1047
+*.sic working-tree-encoding=IBM-1047
+*.h working-tree-encoding=IBM-1047
