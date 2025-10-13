@@ -1,0 +1,46 @@
+|-----------------------------------------------------------------------------------------------|
+|                                                                                               |
+|                                  /$$$$$$  /$$$$$$  /$$$$$$\                                   |
+|                                 /$$__  $$|_  $$_/ /$$__  $$                                   |
+|                                | $$  \__/  | $$  | $$  \__/                                   |
+|                                |  $$$$$$   | $$  | $$                                         |
+|                                 \____  $$  | $$  | $$                                         |
+|                                 /$$  \ $$  | $$  | $$    $$                                   |
+|                                |  $$$$$$/ /$$$$$$|  $$$$$$/                                   |
+|                                 \______/ |______/ \______/                                    |
+|                        ___                             __    __                               |
+|                       /   |  _____________  ____ ___  / /_  / /__  _____                      |
+|                      / /| | / ___/ ___/ _ \/ __ `__ \/ __ \/ / _ \/ ___/                      |
+|                     / ___ |(__  |__  )  __/ / / / / / /_/ / /  __/ /                          |
+|                    /_/  |_|____/____/\___/_/ /_/ /_/_.___/_/\___/_/                           |
+|                                                                                               |
+|-----------------------------------------------------------------------------------------------|
+| Name: Rhett Smithgall					                              Project 1 |
+| Class: COP 3404				      				     10/08/2025 |
+|-----------------------------------------------------------------------------------------------|
+| Project Documentation:              								|
+|   This project is pass 1 of a SIC assembler. It takes SIC (simplified instruction computer)   |
+| assembly code and extracts the symbol table. A symbol table consists of the names of all the  |
+| symbols and the hexadecimal addresses of their instructions.                  		|
+|   The order of operations this program follows is simple. After finding and opening the       |
+| assembly file the main loop will read through line-by-line and pass the line to our first     |
+| stop the largest function: getWord(). getWord() will read the line character-by-character and |
+| extract tokens, the 1 character at a time approach was chosen in order to display the column  |
+| number of errors, in addition to the line number. The most important utility of getWord() is  |
+| that it correctly categorizes and labels each token. getWord() produces a struct with a       |
+| symbol, instruction, and operand. if a line lacks one, it's left blank                        |
+|   With each token labeled, further checking functions are atomized and more modular because   |
+| the input is made much more predictable. The rest of the program is essentially checking the  |
+| tokens and making sure they follow the rules of SIC assembly, such as symbols being restricted|
+| to a length of 6, or number constant operands being limited to 3 bytes. If no errors are      |
+| encountered then a new symbol is created, else a fitting error message is displayed           |
+|-----------------------------------------------------------------------------------------------|
+| Development notes:                                                                            |
+| By far the most challenging obstacle to this project was addresses. Figuring out which        |
+| directives interacted with addresses, and then what effect they had, and how to implement that|
+| effect in C was easily the bulk of the project. A close second was how to tokenize the line.  |
+| strtok and sscanff are powerful tools, but the possibility of BYTE C'this has spaces' puts    |
+| powerful constraints on whatever strategy you attempt. Building a line tokenizer that could   |
+| correctly navigate a character constant operand that may or may not have spaces took up the   |
+| rest of the project.                                                                          |
+|-----------------------------------------------------------------------------------------------|	
