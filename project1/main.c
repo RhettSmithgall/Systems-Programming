@@ -2,7 +2,7 @@
 
 int main( int argc, char* argv[]){
     if ( argc !=2 ) {                               //check for the right amount of command-line arguments 
-        printf("\x27[31mERROR:\x27[0m USAGE is %s <filename>\n", argv[0] );
+        printf("%sERROR:%s USAGE is %s <filename>\n",KRED,KNRM,argv[0] );
         return -1; 
 	}
 
@@ -35,7 +35,7 @@ int main( int argc, char* argv[]){
         }
 
         if (isBlank(readLine)) {               //blank lines are not allowed
-            printf("\x27[31mERROR:\x27[0m Blank line found at line %d\n", lineNum);
+            printf("%sERROR:%s Blank line found at line %d\n", KRED,KNRM, lineNum);
             fclose(fp);
             return -1;
         }
@@ -137,7 +137,7 @@ int main( int argc, char* argv[]){
        free(word);
     }
     if(address > 0x8000){
-        printf("\x27[31mERROR:\x27[0m Program too large. Max size is 32767 bytes.\n");
+        printf("%s ERROR:%s Program too large. Max size is 32767 bytes.\n",KRED,KNRM);
         fclose(fp);
         return -1;
     }
