@@ -1,0 +1,7 @@
+.vscode/
+Makefile
+makefile
+grade
+*.o
+*.dbg
+*.exe
