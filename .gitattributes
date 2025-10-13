@@ -3,7 +3,7 @@
 *.h working-tree-encoding=iso8859-1 git-encoding=utf-8
 
 # SIC assembly/source files: IBM-1047 locally, UTF-8 in repo
-*.sic working-tree-encoding=IBM-1047 git-encoding=utf-8
+*.sic working-tree-encoding=iso8859-1 git-encoding=utf-8
 
 # Makefile: ISO8859-1 locally, UTF-8 in repo
 Makefile working-tree-encoding=iso8859-1 git-encoding=utf-8
