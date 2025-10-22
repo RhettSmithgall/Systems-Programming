@@ -90,7 +90,6 @@ int main( int argc, char* argv[]){
         if(strcmp(word->instruction, "START") == 0) {      
             address = strtol(word->operand, NULL, 16);
             strcpy(progName,word->symbol);
-            printf("[%s]\n",progName);
             start = address;
         }
 
@@ -155,13 +154,14 @@ int main( int argc, char* argv[]){
 
     rewind(fp);
 
-    printf("H + program name: %-7s + starting address: %06X + program size: %X\n",progName, start, end - start);
-    printf("H%-7s%06X%06X\n",progName, start, end - start);
-
     char objCode[60] = "";
     address = start;
+    int mods[1024];
+    int j = 0;
 
     char buffer[7] = "";
+
+    printf("H%-7s%06X%06X\n",progName, start, end - start);
 
     while( fgets(readLine, 1023, fp) != NULL   ){       //read the file line by line
         if (readLine[0] == '#'   ) {                    //comment line
@@ -171,8 +171,69 @@ int main( int argc, char* argv[]){
 
         wordStruct* word = getWord(readLine);
 
+        if(symbolExists(SYMTAB,word->operand)){ 
+            if(strcmp(word->instruction, "END") != 0){
+                mods[j] = address;
+                j++; 
+            }
+        }
+
         if(isDirective(word->instruction)){
-            //address = word->operand;
+            if(strcmp(word->instruction, "BYTE") == 0) {   
+                char numbytes[64] = {0};     
+                if(word->operand[0] == 'C') {            
+                    sscanf(word->operand, "C'%[^']'", numbytes); //remove C'__'
+
+                    for(int i = 0;numbytes[i] != '\0';i++){
+                        if(strlen(objCode) == 60){
+                            printf("%02X%s\n",strlen(objCode)/2,objCode);
+                            objCode[0] = '\0';
+                        }
+                        snprintf(buffer, sizeof(buffer), "%X",numbytes[i]); 
+                        strcat(objCode,buffer);
+                    }
+
+                    address += strlen(numbytes); 
+                }
+                else if(word->operand[0] == 'X'){    
+                    sscanf(word->operand, "X'%[^']'", numbytes); //remove X'__'
+
+                    for(int i = 0;numbytes[i] != '\0';i++){
+                        if(strlen(objCode) == 60){
+                            printf("%02X%s\n",strlen(objCode)/2,objCode);
+                            objCode[0] = '\0';
+                        } 
+                        snprintf(buffer, sizeof(buffer), "%c",numbytes[i]); 
+                        strcat(objCode,buffer);
+                    }
+
+                    address += ceil(strlen(numbytes)/2.0); 
+                }
+                }
+                else if(strcmp(word->instruction, "RESB") == 0) {  
+                    if(strlen(objCode)>0){
+                        printf("%02X%s\n",strlen(objCode)/2,objCode);
+                        objCode[0] = '\0'; 
+                    }
+                    address += strtol(word->operand, NULL, 10); 
+                }
+                else if(strcmp(word->instruction, "RESW") == 0) {   
+                    if(strlen(objCode)>0){
+                        printf("%02X%s\n",strlen(objCode)/2,objCode);
+                        objCode[0] = '\0';     
+                    }
+                    address += 3 * strtol(word->operand, NULL, 10); 
+                }
+                else if(strcmp(word->instruction, "WORD") == 0) {   
+                    if(60 - strlen(objCode) < 6){
+                        printf("%02X%s\n",strlen(objCode)/2,objCode);
+                        objCode[0] = '\0';   
+                    }
+                    snprintf(buffer, sizeof(buffer), "%06X",atoi(word->operand)); 
+                    strcat(objCode,buffer);
+                    address += 3;
+                }
+            
             continue;
         }
 
@@ -188,7 +249,7 @@ int main( int argc, char* argv[]){
         strcat(objCode,buffer);
         //printf("%s:%s\n",word->operand,buffer);
 
-        if(strlen(objCode) == 60){
+        if(60 - strlen(objCode) < 6){
             printf("%02X%s\n",strlen(objCode)/2,objCode);
             objCode[0] = '\0';
         }
@@ -197,6 +258,10 @@ int main( int argc, char* argv[]){
     }
     if(strlen(objCode) > 0){
         printf("%02X%s\n",strlen(objCode)/2,objCode);
+    }
+
+    for(int i = 0;i<j;i++){
+        printf("M%06X04+%s\n",mods[i]+1,progName);
     }
 
     printf("E%06X",start);
