@@ -28,6 +28,10 @@ int main( int argc, char* argv[]){
     struct symbol* SYMTAB = NULL; //declare a pointer to a symbol table
     int address = 0x0;
 
+    char progName[7] = "";
+    int start = 0;
+    int end = 0;
+
 	while( fgets(readLine, 1023, fp) != NULL   ){       //read the file line by line
         if (readLine[0] == '#'   ) {                    //comment line
             lineNum++;
@@ -85,6 +89,9 @@ int main( int argc, char* argv[]){
 
         if(strcmp(word->instruction, "START") == 0) {      
             address = strtol(word->operand, NULL, 16);
+            strcpy(progName,word->symbol);
+            printf("[%s]\n",progName);
+            start = address;
         }
 
         if(word->symbol[0] != '\0'){
@@ -126,9 +133,13 @@ int main( int argc, char* argv[]){
         else if(strcmp(word->instruction, "RESW") == 0) {        
             address += 3 * strtol(word->operand, NULL, 10); 
         }
+        else if(strcmp(word->instruction, "END") == 0) {  
+            end = address;      
+            address += 3; 
+        }
         else{
             if(strcmp(word->instruction, "START") != 0){
-            address += 3;
+                address += 3;
             }
         }
  
@@ -141,8 +152,37 @@ int main( int argc, char* argv[]){
         fclose(fp);
         return -1;
     }
+
+    rewind(fp);
+
+    printf("H + program name: %-7s + starting address: %06X + program size: %X\n",progName, start, end - start);
+    printf("H%-7s%06X%06X\n",progName, start, end - start);
+
+    int objCode[60] = "";
+    address = start;
+
+    while( fgets(readLine, 1023, fp) != NULL   ){       //read the file line by line
+        if (readLine[0] == '#'   ) {                    //comment line
+            lineNum++;
+            continue;	
+        }
+
+        wordStruct* word = getWord(readLine);
+
+        if(isDirective(word->instruction)){
+            //address = word->operand;
+            continue;
+        }
+
+        strcat(objCode,toOpcode(word->instruction));
+
+        strcat(objCode,getSymbolAddress(word->operand));
+
+    }
+
+    printf("E%06X",start);
     
-    printSymbols(SYMTAB);
+    //printSymbols(SYMTAB);
 
     destroySymbolTable(SYMTAB);
 }
