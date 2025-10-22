@@ -264,7 +264,7 @@ int main( int argc, char* argv[]){
         printf("M%06X04+%s\n",mods[i]+1,progName);
     }
 
-    printf("E%06X",start);
+    printf("E%06X\n",start);
     
     //printSymbols(SYMTAB);
 
