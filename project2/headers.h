@@ -25,6 +25,8 @@ typedef struct {
 
 //function defintions
 wordStruct* getWord(char* readLine);
+int toOpcode(char* token);
+int getSymbolAddress(struct symbol* head,char* token);
 int isBlank(char* line);
 void error(char* filename, wordStruct* word,char* message,int linenum,int col);
 int isValidSymbolName(char* token);

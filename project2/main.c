@@ -158,8 +158,10 @@ int main( int argc, char* argv[]){
     printf("H + program name: %-7s + starting address: %06X + program size: %X\n",progName, start, end - start);
     printf("H%-7s%06X%06X\n",progName, start, end - start);
 
-    int objCode[60] = "";
+    char objCode[60] = "";
     address = start;
+
+    char buffer[7] = "";
 
     while( fgets(readLine, 1023, fp) != NULL   ){       //read the file line by line
         if (readLine[0] == '#'   ) {                    //comment line
@@ -174,10 +176,27 @@ int main( int argc, char* argv[]){
             continue;
         }
 
-        strcat(objCode,toOpcode(word->instruction));
+        if(objCode[0] == '\0'){
+            printf("T%06X",address);
+        }
 
-        strcat(objCode,getSymbolAddress(word->operand));
+        snprintf(buffer, sizeof(buffer), "%02X",toOpcode(word->instruction)); 
+        strcat(objCode,buffer);
+        //printf("%s:%s\n",word->instruction,buffer);
 
+        snprintf(buffer, sizeof(buffer), "%04X",getSymbolAddress(SYMTAB,word->operand)); 
+        strcat(objCode,buffer);
+        //printf("%s:%s\n",word->operand,buffer);
+
+        if(strlen(objCode) == 60){
+            printf("%02X%s\n",strlen(objCode)/2,objCode);
+            objCode[0] = '\0';
+        }
+
+        address += 3;
+    }
+    if(strlen(objCode) > 0){
+        printf("%02X%s\n",strlen(objCode)/2,objCode);
     }
 
     printf("E%06X",start);

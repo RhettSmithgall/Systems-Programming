@@ -1,6 +1,6 @@
 #include "headers.h"
 
-char* opcodes[] = {
+char* ops[] = {
     "ADD","ADDF","ADDR","AND","CLEAR","COMP","COMPF","COMPR",
     "DIV","DIVF","DIVR","FIX","FLOAT","HIO","J","JEQ","JGT","JLT",
     "JSUB","LDA","LDB","LDCH","LDF","LDL","LDS","LDT","LDX","LPS",
@@ -13,10 +13,10 @@ int isOpcode(char* token) {
     
     //https://www.geeksforgeeks.org/c/length-of-array-in-c/
     //this works because of pointer trickery
-    int n = sizeof(opcodes) / sizeof(opcodes[0]); //basically n = length(opcodes)
+    int n = sizeof(ops) / sizeof(ops[0]); //basically n = length(opcodes)
     
     for(int i = 0; i < n; i++) {
-        if ( strcmp(token, opcodes[i]) == 0 ) {
+        if ( strcmp(token, ops[i]) == 0 ) {
             return 1; 
         }
     }
