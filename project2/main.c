@@ -154,6 +154,8 @@ int main( int argc, char* argv[]){
 
     rewind(fp);
 
+    FILE *fpout = fopen("output.txt", "w");
+
     char objCode[60] = "";
     address = start;
     int mods[1024];
@@ -162,6 +164,7 @@ int main( int argc, char* argv[]){
     char buffer[7] = "";
 
     printf("H%-7s%06X%06X\n",progName, start, end - start);
+    fprintf(fpout,"H%-7s%06X%06X\n",progName, start, end - start);
 
     while( fgets(readLine, 1023, fp) != NULL   ){       //read the file line by line
         if (readLine[0] == '#'   ) {                    //comment line
@@ -187,6 +190,7 @@ int main( int argc, char* argv[]){
                     for(int i = 0;numbytes[i] != '\0';i++){
                         if(strlen(objCode) == 60){
                             printf("%02X%s\n",strlen(objCode)/2,objCode);
+                            fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                             objCode[0] = '\0';
                         }
                         snprintf(buffer, sizeof(buffer), "%X",numbytes[i]); 
@@ -201,6 +205,7 @@ int main( int argc, char* argv[]){
                     for(int i = 0;numbytes[i] != '\0';i++){
                         if(strlen(objCode) == 60){
                             printf("%02X%s\n",strlen(objCode)/2,objCode);
+                            fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                             objCode[0] = '\0';
                         } 
                         snprintf(buffer, sizeof(buffer), "%c",numbytes[i]); 
@@ -213,6 +218,7 @@ int main( int argc, char* argv[]){
                 else if(strcmp(word->instruction, "RESB") == 0) {  
                     if(strlen(objCode)>0){
                         printf("%02X%s\n",strlen(objCode)/2,objCode);
+                        fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                         objCode[0] = '\0'; 
                     }
                     address += strtol(word->operand, NULL, 10); 
@@ -220,6 +226,7 @@ int main( int argc, char* argv[]){
                 else if(strcmp(word->instruction, "RESW") == 0) {   
                     if(strlen(objCode)>0){
                         printf("%02X%s\n",strlen(objCode)/2,objCode);
+                        fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                         objCode[0] = '\0';     
                     }
                     address += 3 * strtol(word->operand, NULL, 10); 
@@ -227,6 +234,7 @@ int main( int argc, char* argv[]){
                 else if(strcmp(word->instruction, "WORD") == 0) {   
                     if(60 - strlen(objCode) < 6){
                         printf("%02X%s\n",strlen(objCode)/2,objCode);
+                        fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                         objCode[0] = '\0';   
                     }
                     snprintf(buffer, sizeof(buffer), "%06X",atoi(word->operand)); 
@@ -239,6 +247,7 @@ int main( int argc, char* argv[]){
 
         if(objCode[0] == '\0'){
             printf("T%06X",address);
+            fprintf(fpout,"T%06X",address);
         }
 
         snprintf(buffer, sizeof(buffer), "%02X",toOpcode(word->instruction)); 
@@ -251,6 +260,7 @@ int main( int argc, char* argv[]){
 
         if(60 - strlen(objCode) < 6){
             printf("%02X%s\n",strlen(objCode)/2,objCode);
+            fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
             objCode[0] = '\0';
         }
 
@@ -258,13 +268,18 @@ int main( int argc, char* argv[]){
     }
     if(strlen(objCode) > 0){
         printf("%02X%s\n",strlen(objCode)/2,objCode);
+        fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
     }
 
     for(int i = 0;i<j;i++){
         printf("M%06X04+%s\n",mods[i]+1,progName);
+        fprintf(fpout,"M%06X04+%s\n",mods[i]+1,progName);
     }
 
     printf("E%06X\n",start);
+    fprintf(fpout,"E%06X\n",start);
+
+    //add 0x8000 or smth to lines with <something>,X
     
     //printSymbols(SYMTAB);
 

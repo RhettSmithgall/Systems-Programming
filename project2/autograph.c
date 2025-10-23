@@ -1,16 +1,5 @@
 #include "headers.h"
 
-//COLORS!!!
-#define KNRM  "\x27[0m"
-#define KRED  "\x27[31m"
-#define KGRN  "\x27[32m"
-#define KYEL  "\x27[33m"
-#define KBLU  "\x27[34m"
-#define KMAG  "\x27[35m"
-#define KCYN  "\x27[36m"
-#define KWHT  "\x27[37m"
-
-
 void autograph()
 {
     printf("This program was created by...                                               \n");
