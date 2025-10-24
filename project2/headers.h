@@ -51,6 +51,12 @@ struct symbol {
 	struct symbol *next;
 	};
 
+//a struct for a recird table
+struct record {
+	char rec[128];
+	struct record *next;
+	};
+
 //a struct for a SIC Assembly WORD
 typedef struct {
     char symbol[128];
@@ -62,6 +68,11 @@ typedef struct {
 } wordStruct;
 
 //function defintions
+void fprintRecords(FILE *fp,struct record* head);
+struct record* createRecord(char* str);
+struct record* insertRecord(struct record** head, char* str);
+void printRecords(struct record* head);
+void destroyRecords(struct record* head);
 wordStruct* getWord(char* readLine);
 int toOpcode(char* token);
 int getSymbolAddress(struct symbol* head,char* token);

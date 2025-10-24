@@ -2,9 +2,9 @@
 
 void destroySymbolTable(struct symbol* head) {
     if (head == NULL) {
-        return;  // Base case: end of list
+        return; 
     }
-    struct symbol* next = head->next;  // Save next pointer before freeing
+    struct symbol* next = head->next;  
     free(head);
-    destroySymbolTable(next);  // Recurse on the saved next pointer
+    destroySymbolTable(next);  
 }

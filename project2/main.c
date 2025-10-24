@@ -166,19 +166,26 @@ int main( int argc, char* argv[]){
 
     rewind(fp);
 
-    FILE *fpout = fopen("output.txt", "w");
+    char recordLine[128]; //the line we build the record on!
 
-    char objCode[60] = "";
+    char objCode[70] = "";
     address = start;
     int mods[1024];
     int j = 0;
 
     int fei = -1; //FIRST EXECUTABLE INSTRUCTION
 
-    char buffer[7] = "";
+    char buffer[80] = "";
 
-    printf("H%-7s%06X%06X\n",progName, start, end - start);
-    fprintf(fpout,"H%-7s%06X%06X\n",progName, start, end - start);
+
+    snprintf(buffer,sizeof(buffer),"%s.obj",argv[1]); 
+    FILE *fpout = fopen(buffer, "w");
+
+    struct record* OPTAB = NULL; //declare a pointer to a record table
+
+    snprintf(recordLine,sizeof(recordLine),"H%-7s%06X%06X\n",progName, start, end - start);
+    insertRecord(&OPTAB,objCode);
+    recordLine[0] = '\0';
 
     lineNum = 1;
     while( fgets(readLine, 1023, fp) != NULL   ){       //read the file line by line
@@ -201,14 +208,17 @@ int main( int argc, char* argv[]){
                 if(word->operand[0] == 'C') {            
                     sscanf(word->operand, "C'%[^']'", numbytes); //remove C'__'
 
-                    for(int i = 0;numbytes[i] != '\0';i++){
-                        if(strlen(objCode) == 60){
-                            printf("%02X%s\n",strlen(objCode)/2,objCode);
-                            fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
+                    for(int i = 0;numbytes[i] != '\0';i++){ //go through each character in the string, convert to ascii and print
+                        if(strlen(objCode) == 60){ //if there is no more room in the text record, make a new one
+                            snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
+                            strcat(recordLine,buffer);
+                            insertRecord(&OPTAB,recordLine);
+                            recordLine[0] = '\0';
                             objCode[0] = '\0';
-                        }
+                        } //if no text record exists, start one
                         if(objCode[0] == '\0'){
-                            printf("T%06X",address);
+                            snprintf(buffer, sizeof(buffer),"T%06X",address);
+                            strcat(recordLine,buffer);
                         }
                         snprintf(buffer, sizeof(buffer), "%X",numbytes[i]); 
                         strcat(objCode,buffer);
@@ -220,12 +230,15 @@ int main( int argc, char* argv[]){
 
                     for(int i = 0;numbytes[i] != '\0';i++){
                         if(strlen(objCode) == 60){
-                            printf("%02X%s\n",strlen(objCode)/2,objCode);
-                            fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
+                            snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
+                            strcat(recordLine,buffer);
+                            insertRecord(&OPTAB,recordLine);
+                            recordLine[0] = '\0';
                             objCode[0] = '\0';
                         } 
                         if(objCode[0] == '\0'){
-                            printf("T%06X",address);
+                            snprintf(buffer,sizeof(buffer),"T%06X",address);
+                            strcat(recordLine,buffer);
                         }
                         snprintf(buffer, sizeof(buffer), "%c",numbytes[i]); 
                         strcat(objCode,buffer);
@@ -237,28 +250,35 @@ int main( int argc, char* argv[]){
                 }
                 else if(strcmp(word->instruction, "RESB") == 0) {  //RESB always ends a text record
                     if(strlen(objCode)>0){ //if there is anything in the buffer, print it and end the text record
-                        printf("%02X%s\n",strlen(objCode)/2,objCode);
-                        fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
+                        snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
+                        strcat(recordLine,buffer);
+                        insertRecord(&OPTAB,recordLine);
+                        recordLine[0] = '\0';
                         objCode[0] = '\0'; 
                     }
                     address += strtol(word->operand, NULL, 10); 
                 }
                 else if(strcmp(word->instruction, "RESW") == 0) {  //RESW, like its brother, also ends text records
                     if(strlen(objCode)>0){ //if there is anything in the buffer, print it and end the text record
-                        printf("%02X%s\n",strlen(objCode)/2,objCode);
-                        fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
+                        snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
+                        strcat(recordLine,buffer);
+                        insertRecord(&OPTAB,recordLine);
+                        recordLine[0] = '\0';
                         objCode[0] = '\0';     
                     }
                     address += 3 * strtol(word->operand, NULL, 10); 
                 }
                 else if(strcmp(word->instruction, "WORD") == 0) {  
                     if(60 - strlen(objCode) < 6){
-                        printf("%02X%s\n",strlen(objCode)/2,objCode);
-                        fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
+                        snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
+                        strcat(recordLine,buffer);
+                        insertRecord(&OPTAB,recordLine);
+                        recordLine[0] = '\0';
                         objCode[0] = '\0';   
                     }
                     if(objCode[0] == '\0'){
-                            printf("T%06X",address);
+                        snprintf(buffer, sizeof(buffer),"T%06X",address);
+                        strcat(recordLine,buffer);
                     }
                     snprintf(buffer, sizeof(buffer), "%06X",atoi(word->operand)); 
                     strcat(objCode,buffer);
@@ -268,10 +288,12 @@ int main( int argc, char* argv[]){
             continue;
         }
 
+        
         if(objCode[0] == '\0'){
-            printf("T%06X^",address);
+            snprintf(buffer, sizeof(buffer),"T%06X",address);
+            strcat(recordLine,buffer);
         }
-
+        
         if (strchr(word->operand, ',') != NULL) {
             char* token = strtok(word->operand,",");
 
@@ -315,29 +337,42 @@ int main( int argc, char* argv[]){
         }
 
         if(60 - strlen(objCode) < 6){ //if there isn't enough room left in the buffer for another record, end the record
-            printf("%02X%s\n",strlen(objCode)/2,objCode);
-            fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
+            snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
+            strcat(recordLine,buffer);
+            insertRecord(&OPTAB,recordLine);
+            recordLine[0] = '\0';
             objCode[0] = '\0';
         }
+
 
         address += 3;
         lineNum++;
     }
     if(strlen(objCode) > 0){
         if(objCode[0] == '\0'){
-            printf("T%06X",address);
+            snprintf(buffer, sizeof(buffer),"T%06X",address);
+            strcat(recordLine,buffer);
         }
-        printf("%02X%s\n",strlen(objCode)/2,objCode);
-        fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
+        snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
+        strcat(recordLine,buffer);
+        insertRecord(&OPTAB,recordLine);
     }
 
     for(int i = 0;i<j;i++){
-        printf("M%06X04+%s\n",mods[i]+1,progName);
-        fprintf(fpout,"M%06X04+%s\n",mods[i]+1,progName);
+        snprintf(recordLine,sizeof(recordLine),"M%06X04+%s\n",mods[i]+1,progName);
+        insertRecord(&OPTAB,recordLine);
+        recordLine[0] = '\0';
     }
 
-    printf("E%06X\n",fei);
-    fprintf(fpout,"E%06X\n",fei);
+
+    snprintf(recordLine,sizeof(recordLine),"E%06X\n",fei);
+    insertRecord(&OPTAB,recordLine);
+
+    //printRecords(OPTAB);
+    
+    fprintRecords(fpout,OPTAB);
+
+    //destroyRecords(OPTAB);
 
     //add 0x8000 or smth to lines with <something>,X
     
