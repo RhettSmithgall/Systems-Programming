@@ -32,6 +32,8 @@ int main( int argc, char* argv[]){
     int start = 0;
     int end = 0;
 
+    int seenStart = 0;
+
 	while( fgets(readLine, 1023, fp) != NULL   ){       //read the file line by line
         if (readLine[0] == '#'   ) {                    //comment line
             lineNum++;
@@ -39,12 +41,22 @@ int main( int argc, char* argv[]){
         }
 
         if (isBlank(readLine)) {               //blank lines are not allowed
-            printf("\x27[31mERROR:\x27[0m Blank line found at line %d\n", lineNum);
+            printf("%sERROR:%s Blank line found at line %d\n",KRED,KNRM, lineNum);
             fclose(fp);
             return -1;
         }
 
         wordStruct* word = getWord(readLine);
+
+        if(seenStart == 0){ //if we haven't seen start yet
+            if(strcmp(word->instruction, "START") == 0){ //check the line
+                seenStart = 1; //if its there, great!
+            }
+            else{ //if not, error :(
+                printf("ERROR: Expected a START directive at line %d",lineNum);
+                return -1;
+                }
+        }
         
         //this block checks the symbol token and makes sure it follows the rules
         if(word->symbol[0] != '\0'){
@@ -147,7 +159,7 @@ int main( int argc, char* argv[]){
        free(word);
     }
     if(address > 0x8000){
-        printf("\x27[31mERROR:\x27[0m Program too large. Max size is 32767 bytes.\n");
+        printf("%sERROR:%s Program too large. Max size is 32767 bytes.\n",KRED,KNRM);
         fclose(fp);
         return -1;
     }
@@ -161,23 +173,25 @@ int main( int argc, char* argv[]){
     int mods[1024];
     int j = 0;
 
+    int fei = -1; //FIRST EXECUTABLE INSTRUCTION
+
     char buffer[7] = "";
 
     printf("H%-7s%06X%06X\n",progName, start, end - start);
     fprintf(fpout,"H%-7s%06X%06X\n",progName, start, end - start);
 
+    lineNum = 1;
     while( fgets(readLine, 1023, fp) != NULL   ){       //read the file line by line
-        if (readLine[0] == '#'   ) {                    //comment line
+        if (readLine[0] == '#'   ) {                   //comment line
             lineNum++;
             continue;	
         }
 
         wordStruct* word = getWord(readLine);
 
-        if(symbolExists(SYMTAB,word->operand)){ 
-            if(strcmp(word->instruction, "END") != 0){
-                mods[j] = address;
-                j++; 
+        if(fei == -1){
+            if(isDirective(word->instruction) == 0){ //isDirective returns 0 on false, dont even start, i know
+                fei = address;
             }
         }
 
@@ -193,11 +207,13 @@ int main( int argc, char* argv[]){
                             fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                             objCode[0] = '\0';
                         }
+                        if(objCode[0] == '\0'){
+                            printf("T%06X",address);
+                        }
                         snprintf(buffer, sizeof(buffer), "%X",numbytes[i]); 
                         strcat(objCode,buffer);
+                        address++;
                     }
-
-                    address += strlen(numbytes); 
                 }
                 else if(word->operand[0] == 'X'){    
                     sscanf(word->operand, "X'%[^']'", numbytes); //remove X'__'
@@ -208,65 +224,109 @@ int main( int argc, char* argv[]){
                             fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                             objCode[0] = '\0';
                         } 
+                        if(objCode[0] == '\0'){
+                            printf("T%06X",address);
+                        }
                         snprintf(buffer, sizeof(buffer), "%c",numbytes[i]); 
                         strcat(objCode,buffer);
+                        if(i%2 == 0 && i != 0){ //every 2 numbers is a byte
+                            address++;
+                        }
                     }
-
-                    address += ceil(strlen(numbytes)/2.0); 
                 }
                 }
-                else if(strcmp(word->instruction, "RESB") == 0) {  
-                    if(strlen(objCode)>0){
+                else if(strcmp(word->instruction, "RESB") == 0) {  //RESB always ends a text record
+                    if(strlen(objCode)>0){ //if there is anything in the buffer, print it and end the text record
                         printf("%02X%s\n",strlen(objCode)/2,objCode);
                         fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                         objCode[0] = '\0'; 
                     }
                     address += strtol(word->operand, NULL, 10); 
                 }
-                else if(strcmp(word->instruction, "RESW") == 0) {   
-                    if(strlen(objCode)>0){
+                else if(strcmp(word->instruction, "RESW") == 0) {  //RESW, like its brother, also ends text records
+                    if(strlen(objCode)>0){ //if there is anything in the buffer, print it and end the text record
                         printf("%02X%s\n",strlen(objCode)/2,objCode);
                         fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                         objCode[0] = '\0';     
                     }
                     address += 3 * strtol(word->operand, NULL, 10); 
                 }
-                else if(strcmp(word->instruction, "WORD") == 0) {   
+                else if(strcmp(word->instruction, "WORD") == 0) {  
                     if(60 - strlen(objCode) < 6){
                         printf("%02X%s\n",strlen(objCode)/2,objCode);
                         fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
                         objCode[0] = '\0';   
                     }
+                    if(objCode[0] == '\0'){
+                            printf("T%06X",address);
+                    }
                     snprintf(buffer, sizeof(buffer), "%06X",atoi(word->operand)); 
                     strcat(objCode,buffer);
                     address += 3;
                 }
-            
+            lineNum++;
             continue;
         }
 
         if(objCode[0] == '\0'){
-            printf("T%06X",address);
-            fprintf(fpout,"T%06X",address);
+            printf("T%06X^",address);
         }
 
-        snprintf(buffer, sizeof(buffer), "%02X",toOpcode(word->instruction)); 
-        strcat(objCode,buffer);
-        //printf("%s:%s\n",word->instruction,buffer);
+        if (strchr(word->operand, ',') != NULL) {
+            char* token = strtok(word->operand,",");
 
-        snprintf(buffer, sizeof(buffer), "%04X",getSymbolAddress(SYMTAB,word->operand)); 
-        strcat(objCode,buffer);
-        //printf("%s:%s\n",word->operand,buffer);
+            if(symbolExists(SYMTAB,token) == 0){ //if the symbol being used isn't defined
+                snprintf(msg, sizeof(msg), "Operand %s on was never defined",token); 
+                error(argv[1],word,msg,lineNum,word->opcol);
+                fclose(fp);
+                return -1;
+            }
 
-        if(60 - strlen(objCode) < 6){
+            snprintf(buffer, sizeof(buffer), "%02X",toOpcode(word->instruction)); 
+            strcat(objCode,buffer);
+
+            snprintf(buffer, sizeof(buffer), "%04X",getSymbolAddress(SYMTAB,token) - 0x8000); 
+            strcat(objCode,buffer);
+
+            if(symbolExists(SYMTAB,token)){ //make a mod record
+                mods[j] = address;
+                j++; 
+            }
+        } 
+        else 
+        {
+            if(symbolExists(SYMTAB,word->operand) == 0){ //if the symbol being used isn't defined
+                snprintf(msg, sizeof(msg), "Operand %s on was never defined",word->operand); 
+                error(argv[1],word,msg,lineNum,word->opcol);
+                fclose(fp);
+                return -1;
+            }
+
+            snprintf(buffer, sizeof(buffer), "%02X",toOpcode(word->instruction)); 
+            strcat(objCode,buffer);
+
+            snprintf(buffer, sizeof(buffer), "%04X",getSymbolAddress(SYMTAB,word->operand)); 
+            strcat(objCode,buffer);
+
+            if(symbolExists(SYMTAB,word->operand)){ 
+                mods[j] = address;
+                j++; 
+            }
+        }
+
+        if(60 - strlen(objCode) < 6){ //if there isn't enough room left in the buffer for another record, end the record
             printf("%02X%s\n",strlen(objCode)/2,objCode);
             fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
             objCode[0] = '\0';
         }
 
         address += 3;
+        lineNum++;
     }
     if(strlen(objCode) > 0){
+        if(objCode[0] == '\0'){
+            printf("T%06X",address);
+        }
         printf("%02X%s\n",strlen(objCode)/2,objCode);
         fprintf(fpout,"%02X%s\n",strlen(objCode)/2,objCode);
     }
@@ -276,14 +336,14 @@ int main( int argc, char* argv[]){
         fprintf(fpout,"M%06X04+%s\n",mods[i]+1,progName);
     }
 
-    printf("E%06X\n",start);
-    fprintf(fpout,"E%06X\n",start);
+    printf("E%06X\n",fei);
+    fprintf(fpout,"E%06X\n",fei);
 
     //add 0x8000 or smth to lines with <something>,X
     
     //printSymbols(SYMTAB);
 
-    destroySymbolTable(SYMTAB);
+    destroySymbolTable(SYMTAB); 
 }
 
 
