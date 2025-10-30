@@ -61,22 +61,22 @@ wordStruct* getWord(char* readLine){
     if(toknum == 1){
         word->symbol[0] = '\0';
         strcpy(word->instruction, tokens[0]);
-        word->inscol = tokcol[0] + 4;
+        word->inscol = tokcol[0];
         word->operand[0] = '\0';
     }
     else if(toknum == 2){
         word->symbol[0] = '\0';
         strcpy(word->instruction, tokens[0]);
-        word->inscol = tokcol[0] + 4;
+        word->inscol = tokcol[0];
         strcpy(word->operand, tokens[1]);
-        word->opcol = tokcol[1] + 8;
+        word->opcol = tokcol[1];
     } else if(toknum > 2){
         strcpy(word->symbol, tokens[0]);
         word->symcol = tokcol[0];
         strcpy(word->instruction, tokens[1]);
-        word->inscol = tokcol[1] + 4;
+        word->inscol = tokcol[1];
         strcpy(word->operand, tokens[2]);
-        word->opcol = tokcol[2] + 8;
+        word->opcol = tokcol[2];
     }
 
     for (int i = 0; i < toknum; i++) {

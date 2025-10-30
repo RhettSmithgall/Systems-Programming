@@ -5,3 +5,4 @@ grade
 *.o
 *.dbg
 *.exe
+*.obj

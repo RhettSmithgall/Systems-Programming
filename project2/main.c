@@ -2,7 +2,7 @@
 
 int main( int argc, char* argv[]){
     if ( argc !=2 ) {                               //check for the right amount of command-line arguments 
-        printf("\x27[31mERROR:\x27[0m USAGE is %s <filename>\n", argv[0] );
+        printf("%sERROR:%s USAGE is %s <filename>\n",KRED,KNRM, argv[0] );
         return -1; 
 	}
 
@@ -14,7 +14,7 @@ int main( int argc, char* argv[]){
     FILE *fp;
 	fp = fopen( argv[1], "r"  );                    //try and open the file
 	if ( fp == NULL ) {
-		printf("\x27[31mERROR:\x27[0m file %s not found\n",argv[1]);
+		printf("%sERROR:%s file %s not found\n",KRED,KNRM,argv[1]);
         fclose(fp);
 		return -1;
 	}
@@ -53,7 +53,7 @@ int main( int argc, char* argv[]){
                 seenStart = 1; //if its there, great!
             }
             else{ //if not, error :(
-                printf("ERROR: Expected a START directive at line %d",lineNum);
+                printf("%sERROR:%s Expected a START directive at line %d\n",KRED,KNRM,lineNum);
                 return -1;
                 }
         }
@@ -63,28 +63,28 @@ int main( int argc, char* argv[]){
 	    int i = symbolExists(SYMTAB,word->symbol);
             if(i > 0) {   //see if the symbol is already defined  
             snprintf(msg, sizeof(msg), "Symbol %s was already defined on line %d", word->symbol, i); 
-            error(argv[1],word,msg,lineNum,word->symcol);
+            error(argv[1],readLine,word,msg,lineNum,word->symcol);
             fclose(fp);
             return -1;
             }
 
             if(isDirective(word->symbol) || isOpcode(word->symbol)){
             snprintf(msg, sizeof(msg), "Symbol %s is a SIC assembly reserved instruction name", word->symbol); 
-            error(argv[1],word,msg,lineNum,word->symcol);
+            error(argv[1],readLine,word,msg,lineNum,word->symcol);
             fclose(fp);
             return -1;
             }
 
             if (!isalpha(word->symbol[0])) { // Check if first character is A-Z
             snprintf(msg, sizeof(msg), "Character %c at the begining of symbol %s is not A-Z",word->symbol[0],word->symbol); 
-            error(argv[1],word,msg,lineNum,word->symcol);
+            error(argv[1],readLine,word,msg,lineNum,word->symcol);
             fclose(fp);
             return -1;
             }
 
             if (strlen(word->symbol) > 6) { // Check length <= 6
             snprintf(msg, sizeof(msg), "Symbol %s is longer than 6 characters",word->symbol); 
-            error(argv[1],word,msg,lineNum,word->symcol);
+            error(argv[1],readLine,word,msg,lineNum,word->symcol);
             fclose(fp);
             return -1;
             }
@@ -92,7 +92,7 @@ int main( int argc, char* argv[]){
             for (int i = 0; word->symbol[i] != '\0'; i++) { // Check for forbidden characters
             if (strchr(",$!=+-()@", word->symbol[i]) != NULL) {
                 snprintf(msg, sizeof(msg), "Invalid character %c in symbol %s",word->symbol[i],word->symbol); 
-                error(argv[1],word,msg,lineNum,word->symcol+i+1);
+                error(argv[1],readLine,word,msg,lineNum,word->symcol+i+1);
                 fclose(fp);
                 return -1;
             }
@@ -122,7 +122,7 @@ int main( int argc, char* argv[]){
             if (i > 0) //valid hex characters
             {
                 snprintf(msg, sizeof(msg), "Operand %s contains invalid hex character '%c'",word->operand,numbytes[i-1]); 
-                error(argv[1],word,msg,lineNum,word->opcol + i);
+                error(argv[1],readLine,word,msg,lineNum,word->opcol + i);
                 fclose(fp);
                 return -1;
             }
@@ -132,7 +132,7 @@ int main( int argc, char* argv[]){
         else if(strcmp(word->instruction, "WORD") == 0) {  
             if(strtol(word->operand, NULL, 10) > 0x7FFFFF){
             snprintf(msg, sizeof(msg), "Operand %s exceeds 24 bit word limit",word->operand); 
-            error(argv[1],word,msg,lineNum,word->opcol);
+            error(argv[1],readLine,word,msg,lineNum,word->opcol);
             fclose(fp);
             return -1;
             }     
@@ -284,6 +284,14 @@ int main( int argc, char* argv[]){
                     strcat(objCode,buffer);
                     address += 3;
                 }
+                else if(strcmp(word->instruction, "END") == 0){
+                    if(symbolExists(SYMTAB,word->operand) == 0){ 
+                        snprintf(msg, sizeof(msg), "Operand %s on was never defined",word->operand); 
+                        error(argv[1],readLine,word,msg,lineNum,word->opcol);
+                        fclose(fp);
+                        return -1;
+                    }
+                }
             lineNum++;
             continue;
         }
@@ -297,9 +305,9 @@ int main( int argc, char* argv[]){
         if (strchr(word->operand, ',') != NULL) {
             char* token = strtok(word->operand,",");
 
-            if(symbolExists(SYMTAB,token) == 0){ //if the symbol being used isn't defined
+            if(symbolExists(SYMTAB,token) == 0  && word->operand[0] != '\0'){ //if the symbol being used isn't defined
                 snprintf(msg, sizeof(msg), "Operand %s on was never defined",token); 
-                error(argv[1],word,msg,lineNum,word->opcol);
+                error(argv[1],readLine,word,msg,lineNum,word->opcol);
                 fclose(fp);
                 return -1;
             }
@@ -317,9 +325,9 @@ int main( int argc, char* argv[]){
         } 
         else 
         {
-            if(symbolExists(SYMTAB,word->operand) == 0){ //if the symbol being used isn't defined
+            if(symbolExists(SYMTAB,word->operand) == 0 && word->operand[0] != '\0'){ //if the symbol being used isn't defined
                 snprintf(msg, sizeof(msg), "Operand %s on was never defined",word->operand); 
-                error(argv[1],word,msg,lineNum,word->opcol);
+                error(argv[1],readLine,word,msg,lineNum,word->opcol);
                 fclose(fp);
                 return -1;
             }

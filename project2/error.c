@@ -1,23 +1,61 @@
 #include "headers.h"
-void error(char* filename, wordStruct* word,char* message,int linenum,int col){
-        printf("%s:%d:%d\x27[31m ERROR: \x27[0m %s\n", filename, linenum, col, message);
+void error(char* filename,char* line,wordStruct* word,char* message,int linenum,int col){
+    printf("%s:%d:%d %sERROR:%s %s\n", filename, linenum, col,KRED,KNRM,message);
         
-int sym_len = strlen(word->symbol);
-int instr_len = strlen(word->instruction);
+    int n = strlen(line);
 
-if (col < sym_len) {
-    // Make symbol green
-    printf(" %3d |  \x27[32m%s\x27[0m\t%s\t%s\n", linenum, word->symbol, word->instruction, word->operand);
-} else if (col < sym_len + 1 + instr_len) {  // +1 for the tab/space between fields
-    // Make instruction green
-    printf(" %3d |  %s\t\x27[32m%s\x27[0m\t%s\n", linenum, word->symbol, word->instruction, word->operand);
-} else {
-    // Make operand green
-    printf(" %3d |  %s\t%s\t\x27[32m%s\x27[0m\n", linenum, word->symbol, word->instruction, word->operand);
-}
+    int startColor;
+    int endColor;
 
-	if(col > 0){ col -= 1;} //i do not even pretend to know why it gets offset like this
+    if(col < word->inscol){ //error is in the symbol
+        startColor = 0;
+        endColor = word->inscol-1;
+    }
+    else if(col < word->opcol){ //error is in the instruction
+        startColor = word->inscol;
+        endColor = word->opcol-1;
+    }else{ //error is in the operand
+        startColor = word->opcol ;
+        endColor = n - 1;
+    }
 
-	//printf(" %3d | %s\t%s\t%s\n",linenum,word->symbol,word->instruction,word->operand);
-        printf("     |  \x27[32m%*c\x27[0m\n",col,'^');
+    printf(" %3d | ",linenum);
+    for(int i = 0;i<n;i++){
+        if(i == startColor){
+            printf("%s",KGRN);
+        }
+
+        printf("%c",line[i]);
+
+        if(i == endColor){
+            printf("%s",KNRM);
+        }
+    }
+
+    printf("     | ");
+    for(int i = 0;i<n;i++){
+        if(startColor == i){
+            printf("%s",KGRN);
+        }
+
+        if(isspace(line[i])){
+            printf("%c",line[i]);
+        }
+        else{
+
+            if(i == col){
+                printf("^");
+            }
+            else if(startColor <= i && i <= endColor){
+                printf("~");
+            }
+            else{
+                printf(" ");
+            }
+        }
+
+        if(endColor == i){
+            printf("%s",KNRM);
+        }
+    }
 }

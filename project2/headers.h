@@ -20,15 +20,6 @@
     #define KMAG  "\033[35m"
     #define KCYN  "\033[36m"
     #define KWHT  "\033[37m"
-    //background colors
-    #define BNRM "\033[40m"
-    #define BRED "\033[41m"
-    #define BGRN "\033[42m"
-    #define BYEL "\033[43m"
-    #define BBLU "\033[44m"
-    #define BMAG "\033[45m"
-    #define BCYN "\033[46m"
-    #define BWHT "\033[47m"
 #else
     // Mainframe / z/OS escape sequence
     #define KNRM  "\x27[0m"
@@ -77,7 +68,7 @@ wordStruct* getWord(char* readLine);
 int toOpcode(char* token);
 int getSymbolAddress(struct symbol* head,char* token);
 int isBlank(char* line);
-void error(char* filename, wordStruct* word,char* message,int linenum,int col);
+void error(char* filename,char* line,wordStruct* word,char* message,int linenum,int col);
 int isValidSymbolName(char* token);
 void printSymbols(struct symbol* table);
 void destroySymbolTable(struct symbol* head);
