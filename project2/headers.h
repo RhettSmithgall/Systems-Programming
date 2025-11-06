@@ -4,6 +4,8 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
+#include "record.h"
+#include "symbol.h"
 
 // colors.h
 #ifndef COLORS_H
@@ -34,20 +36,6 @@
 
 #endif // COLORS_H
 
-//a struct for a symbol table
-struct symbol {
-	char name[7];
-	int address;
-	int sourceline; 
-	struct symbol *next;
-	};
-
-//a struct for a recird table
-struct record {
-	char rec[128];
-	struct record *next;
-	};
-
 //a struct for a SIC Assembly WORD
 typedef struct {
     char symbol[128];
@@ -59,22 +47,10 @@ typedef struct {
 } wordStruct;
 
 //function defintions
-void fprintRecords(FILE *fp,struct record* head);
-struct record* createRecord(char* str);
-struct record* insertRecord(struct record** head, char* str);
-void printRecords(struct record* head);
-void destroyRecords(struct record* head);
 wordStruct* getWord(char* readLine);
 int toOpcode(char* token);
-int getSymbolAddress(struct symbol* head,char* token);
 int isBlank(char* line);
 void error(char* filename,char* line,wordStruct* word,char* message,int linenum,int col);
-int isValidSymbolName(char* token);
-void printSymbols(struct symbol* table);
-void destroySymbolTable(struct symbol* head);
-int symbolExists( struct symbol* table, char* token);
-struct symbol* createSymbol(char* name, int address, int sourceline);
-struct symbol* insertSymbol(struct symbol** head, char* name, int address, int sourceline);
 int isOpcode(char* token);
 int isDirective(char* token);
 int isValidHex(char* input);

@@ -184,7 +184,7 @@ int main( int argc, char* argv[]){
     struct record* OPTAB = NULL; //declare a pointer to a record table
 
     snprintf(recordLine,sizeof(recordLine),"H%-7s%06X%06X\n",progName, start, end - start);
-    insertRecord(&OPTAB,objCode);
+    insertRecord(&OPTAB,recordLine);
     recordLine[0] = '\0';
 
     lineNum = 1;
@@ -203,7 +203,10 @@ int main( int argc, char* argv[]){
         }
 
         if(isDirective(word->instruction)){
-            if(strcmp(word->instruction, "BYTE") == 0) {   
+            if(strcmp(word->instruction, "START") == 0) {      
+                address = start;
+            }
+            else if(strcmp(word->instruction, "BYTE") == 0) {   
                 char numbytes[64] = {0};     
                 if(word->operand[0] == 'C') {            
                     sscanf(word->operand, "C'%[^']'", numbytes); //remove C'__'
@@ -220,7 +223,8 @@ int main( int argc, char* argv[]){
                             snprintf(buffer, sizeof(buffer),"T%06X",address);
                             strcat(recordLine,buffer);
                         }
-                        snprintf(buffer, sizeof(buffer), "%X",numbytes[i]); 
+                        snprintf(buffer, sizeof(buffer), "%X",numbytes[i]);
+                        printf("line:%d -> i:%d -> %s\n",lineNum,i,buffer); 
                         strcat(objCode,buffer);
                         address++;
                     }
@@ -282,7 +286,8 @@ int main( int argc, char* argv[]){
                     }
                     snprintf(buffer, sizeof(buffer), "%06X",atoi(word->operand)); 
                     strcat(objCode,buffer);
-                    address += 3;
+                    printf("%X",word->operand[0] - '0');
+                    address += (word->operand[0] - '0')*3;
                 }
                 else if(strcmp(word->instruction, "END") == 0){
                     if(symbolExists(SYMTAB,word->operand) == 0){ 
@@ -294,6 +299,14 @@ int main( int argc, char* argv[]){
                 }
             lineNum++;
             continue;
+        }
+
+        if(60 - strlen(objCode) < 6){ //if there isn't enough room left in the buffer for another record, end the record
+            snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
+            strcat(recordLine,buffer);
+            insertRecord(&OPTAB,recordLine);
+            recordLine[0] = '\0';
+            objCode[0] = '\0';
         }
 
         
@@ -344,15 +357,6 @@ int main( int argc, char* argv[]){
             }
         }
 
-        if(60 - strlen(objCode) < 6){ //if there isn't enough room left in the buffer for another record, end the record
-            snprintf(buffer,sizeof(buffer),"%02X%s\n",(int)strlen(objCode)/2,objCode);
-            strcat(recordLine,buffer);
-            insertRecord(&OPTAB,recordLine);
-            recordLine[0] = '\0';
-            objCode[0] = '\0';
-        }
-
-
         address += 3;
         lineNum++;
     }
@@ -376,15 +380,15 @@ int main( int argc, char* argv[]){
     snprintf(recordLine,sizeof(recordLine),"E%06X\n",fei);
     insertRecord(&OPTAB,recordLine);
 
-    //printRecords(OPTAB);
+    printRecords(OPTAB);
     
     fprintRecords(fpout,OPTAB);
 
-    //destroyRecords(OPTAB);
+    destroyRecords(OPTAB);
 
     //add 0x8000 or smth to lines with <something>,X
     
-    //printSymbols(SYMTAB);
+    printSymbols(SYMTAB);
 
     destroySymbolTable(SYMTAB); 
 }
