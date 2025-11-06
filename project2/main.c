@@ -203,8 +203,10 @@ int main( int argc, char* argv[]){
         }
 
         if(isDirective(word->instruction)){
-            if(strcmp(word->instruction, "START") == 0) {      
+            if(strcmp(word->instruction, "START") == 0) {   
+                lineNum++;   
                 address = start;
+                continue;
             }
             else if(strcmp(word->instruction, "BYTE") == 0) {   
                 char numbytes[64] = {0};     
@@ -223,8 +225,7 @@ int main( int argc, char* argv[]){
                             snprintf(buffer, sizeof(buffer),"T%06X",address);
                             strcat(recordLine,buffer);
                         }
-                        snprintf(buffer, sizeof(buffer), "%X",numbytes[i]);
-                        printf("line:%d -> i:%d -> %s\n",lineNum,i,buffer); 
+                        snprintf(buffer, sizeof(buffer), "%X",numbytes[i]); 
                         strcat(objCode,buffer);
                         address++;
                     }
@@ -246,7 +247,7 @@ int main( int argc, char* argv[]){
                         }
                         snprintf(buffer, sizeof(buffer), "%c",numbytes[i]); 
                         strcat(objCode,buffer);
-                        if(i%2 == 0 && i != 0){ //every 2 numbers is a byte
+                        if(i%2 == 0){ //every 2 numbers is a byte
                             address++;
                         }
                     }
@@ -286,8 +287,7 @@ int main( int argc, char* argv[]){
                     }
                     snprintf(buffer, sizeof(buffer), "%06X",atoi(word->operand)); 
                     strcat(objCode,buffer);
-                    printf("%X",word->operand[0] - '0');
-                    address += (word->operand[0] - '0')*3;
+                    address += 3;
                 }
                 else if(strcmp(word->instruction, "END") == 0){
                     if(symbolExists(SYMTAB,word->operand) == 0){ 
@@ -328,7 +328,9 @@ int main( int argc, char* argv[]){
             snprintf(buffer, sizeof(buffer), "%02X",toOpcode(word->instruction)); 
             strcat(objCode,buffer);
 
-            snprintf(buffer, sizeof(buffer), "%04X",getSymbolAddress(SYMTAB,token) - 0x8000); 
+            int addr = getSymbolAddress(SYMTAB,token);
+            addr ^= 0x8000;
+            snprintf(buffer, sizeof(buffer), "%04X",addr); 
             strcat(objCode,buffer);
 
             if(symbolExists(SYMTAB,token)){ //make a mod record
@@ -380,15 +382,13 @@ int main( int argc, char* argv[]){
     snprintf(recordLine,sizeof(recordLine),"E%06X\n",fei);
     insertRecord(&OPTAB,recordLine);
 
-    printRecords(OPTAB);
+    //printRecords(OPTAB);
     
     fprintRecords(fpout,OPTAB);
 
     destroyRecords(OPTAB);
-
-    //add 0x8000 or smth to lines with <something>,X
     
-    printSymbols(SYMTAB);
+    //printSymbols(SYMTAB);
 
     destroySymbolTable(SYMTAB); 
 }
