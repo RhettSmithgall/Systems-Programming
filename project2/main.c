@@ -226,6 +226,8 @@ int main( int argc, char* argv[]){
                             strcat(recordLine,buffer);
                         }
                         snprintf(buffer, sizeof(buffer), "%X",numbytes[i]); 
+                        int num = (int)strtol(buffer, NULL, 16);
+                        snprintf(buffer, sizeof(buffer), "%X",IBM2ISO(num)); 
                         strcat(objCode,buffer);
                         address++;
                     }

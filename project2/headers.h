@@ -47,6 +47,7 @@ typedef struct {
 } wordStruct;
 
 //function defintions
+int IBM2ISO(int number);
 wordStruct* getWord(char* readLine);
 int toOpcode(char* token);
 int isBlank(char* line);
