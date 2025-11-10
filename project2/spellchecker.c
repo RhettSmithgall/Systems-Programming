@@ -39,6 +39,5 @@ struct symbol *spellchecker(const char *target,struct symbol *head) {
             best = cur;
         }
     }
-
     return best;
 }

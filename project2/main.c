@@ -346,7 +346,7 @@ int main( int argc, char* argv[]){
                 char str[9];
                 strcpy(str,word->operand); 
 
-                printf("Did you mean \"%s\"\n",spellchecker(str,SYMTAB)->name);
+                printf("%sDid you mean \"%s\"?%s\n",KBLU,spellchecker(str,SYMTAB)->name,KNRM);
 
                 snprintf(msg, sizeof(msg), "Operand %s on was never defined",word->operand); 
                 error(argv[1],readLine,word,msg,lineNum,word->opcol);
