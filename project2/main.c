@@ -343,6 +343,11 @@ int main( int argc, char* argv[]){
         else 
         {
             if(symbolExists(SYMTAB,word->operand) == 0 && word->operand[0] != '\0'){ //if the symbol being used isn't defined
+                char str[9];
+                strcpy(str,word->operand); 
+
+                printf("Did you mean \"%s\"\n",spellchecker(str,SYMTAB)->name);
+
                 snprintf(msg, sizeof(msg), "Operand %s on was never defined",word->operand); 
                 error(argv[1],readLine,word,msg,lineNum,word->opcol);
                 fclose(fp);

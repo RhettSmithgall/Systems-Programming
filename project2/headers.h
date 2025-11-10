@@ -47,6 +47,8 @@ typedef struct {
 } wordStruct;
 
 //function defintions
+int lcs(const char *a, const char *b);
+struct symbol *spellchecker(const char *target,struct symbol *head);
 int IBM2ISO(int number);
 wordStruct* getWord(char* readLine);
 int toOpcode(char* token);
