@@ -293,6 +293,9 @@ int main( int argc, char* argv[]){
                 }
                 else if(strcmp(word->instruction, "END") == 0){
                     if(symbolExists(SYMTAB,word->operand) == 0){ 
+                        char str[9];                        
+                        strcpy(str,word->operand); 
+                        printf("%sDid you mean \"%s\"?%s\n",KBLU,spellchecker(str,SYMTAB)->name,KNRM);
                         snprintf(msg, sizeof(msg), "Operand %s on was never defined",word->operand); 
                         error(argv[1],readLine,word,msg,lineNum,word->opcol);
                         fclose(fp);
@@ -321,6 +324,9 @@ int main( int argc, char* argv[]){
             char* token = strtok(word->operand,",");
 
             if(symbolExists(SYMTAB,token) == 0  && word->operand[0] != '\0'){ //if the symbol being used isn't defined
+                char str[9];                        
+                strcpy(str,word->operand); 
+                printf("%sDid you mean \"%s\"?%s\n",KBLU,spellchecker(str,SYMTAB)->name,KNRM);
                 snprintf(msg, sizeof(msg), "Operand %s on was never defined",token); 
                 error(argv[1],readLine,word,msg,lineNum,word->opcol);
                 fclose(fp);
@@ -343,7 +349,7 @@ int main( int argc, char* argv[]){
         else 
         {
             if(symbolExists(SYMTAB,word->operand) == 0 && word->operand[0] != '\0'){ //if the symbol being used isn't defined
-                char str[9];
+                char str[9];                         //^^^ could probably get rid of, in theory symbolExists will say false to '\0', right? 
                 strcpy(str,word->operand); 
 
                 printf("%sDid you mean \"%s\"?%s\n",KBLU,spellchecker(str,SYMTAB)->name,KNRM);
