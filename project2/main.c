@@ -1,5 +1,9 @@
 #include "headers.h"
 
+/*
+a 2 pass sic assembler!
+takes a file of sic assembly code and create an object code file
+*/
 int main( int argc, char* argv[]){
     if ( argc !=2 ) {                               //check for the right amount of command-line arguments 
         printf("%sERROR:%s USAGE is %s <filename>\n",KRED,KNRM, argv[0] );

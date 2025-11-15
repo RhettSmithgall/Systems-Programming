@@ -1,4 +1,5 @@
 #include "headers.h"
+//all about records
 
 //creates a record 
 struct record* createRecord(char* str) { 

@@ -8,7 +8,11 @@ char* ops[] = {
     "SHIFTR","SIO","SSK","STA","STB","STCH","STF","STI","STL","STS",
     "STSW","STT","STX","SUB","SUBF","SUBR","SVC","TD","TIO","TIX",
     "TIXR","WD"};
-
+/*
+@brief checks a string to see if its a sic assembly instruction
+@param token the string to check
+@return 1 yes it is an instruction or 0 no it isn't
+*/
 int isOpcode(char* token) {
     
     //https://www.geeksforgeeks.org/c/length-of-array-in-c/

@@ -13,7 +13,6 @@
 
 #if defined(_WIN32) || defined(_WIN64)
     // Windows escape sequence (GCC on MSYS2/MinGW supports ANSI)
-    //text colors
     #define KNRM  "\033[0m"
     #define KRED  "\033[31m"
     #define KGRN  "\033[32m"

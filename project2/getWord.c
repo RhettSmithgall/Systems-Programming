@@ -1,5 +1,13 @@
 #include "headers.h"
 
+
+/*
+@brief takes a line of assembly code and seperates it into labeled tokens
+@param readLine a string of the line to be broken up
+@return a struct 'wordstruct' which holds the symbol, instruction and operand of the line
+as well as the starting column number of each. If a symbol isn't populated it's set to 
+char[0] = '\0';
+*/
 wordStruct* getWord(char* readLine){
     char* tokens[3] = {NULL, NULL, NULL};
     int tokcol[3];

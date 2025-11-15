@@ -20,6 +20,11 @@ int opcodes[] = {
     0x2C, 0xB8, 0xDC
 };
 
+/*
+@brief takes a string of a sic instruction and gives back the corrosponding opcode 
+@param token the string sic instruction
+@return the hex opcode or -1 if the string isn't an instruction
+*/
 int toOpcode(char* token) {
     //https://www.geeksforgeeks.org/c/length-of-array-in-c/
     //this works because of pointer trickery

@@ -1,4 +1,15 @@
 #include "headers.h"
+
+/*
+@brief prints a descriptive error message
+
+@param filename a string of the file the error came from
+@param line a string of the line the error comes from
+@param word the wordstruct of the line the error came from
+@param message a string descriptive error message 
+@param linenum the int line number the error comes from
+@param col the int column number the error is in
+*/
 void error(char* filename,char* line,wordStruct* word,char* message,int linenum,int col){
     printf("%s:%d:%d %sERROR:%s %s\n", filename, linenum, col,KRED,KNRM,message);
         

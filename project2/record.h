@@ -1,4 +1,5 @@
 //a struct for a record table
+//it's a linked list for strings
 struct record {
 	char rec[128];
 	struct record *next;

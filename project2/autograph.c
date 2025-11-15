@@ -1,5 +1,11 @@
 #include "headers.h"
 
+
+/*
+function autograph()
+prints a multi-colored ascii art of my name, rhett smithgall!
+the author of this code. 
+*/
 void autograph()
 {
     printf("This program was created by...                                               \n");

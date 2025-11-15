@@ -1,5 +1,10 @@
 #include "headers.h"
 
+/*
+@brief gives the column number of an invalid character in a hex number string
+@param input a string of the hex number to check
+@return 0 for valid hex, if an invalid character is found it returns the column number of the bad character
+*/
 int isValidHex(char *input) {
     for (int i = 0; i < strlen(input); i++) {
         char c = input[i];

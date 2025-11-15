@@ -1,4 +1,5 @@
 #include "headers.h"
+//all about symbols
 
 //create symbol
 struct symbol* createSymbol(char* name, int address, int sourceline) { 
@@ -11,6 +12,7 @@ struct symbol* createSymbol(char* name, int address, int sourceline) {
     return newNode;
 }
 
+//checks whether a symbol is in the table already or not
 int symbolExists(struct symbol* head,char* token) {
     struct symbol* temp = head;
     while (temp != NULL) {
@@ -47,6 +49,7 @@ void destroySymbolTable(struct symbol* head) {
     destroySymbolTable(next);  
 }
 
+//prints the symbol table
 void printSymbols(struct symbol* head) {
     struct symbol* temp = head;
     while(temp != NULL) {

@@ -40,7 +40,11 @@ static const unsigned char ascii[128] = {
     0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F
 };
 
-
+/*
+@brief accepts the IBM-1047 hex value of a character and returns the ISO8859-1 hex value
+@param number the IBM-1047 hex of a character
+@return the ISO8859-1 hex of the character
+*/
 int IBM2ISO(int number){
 
     for(int i=0;i<128;i++){

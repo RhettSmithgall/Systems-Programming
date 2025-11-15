@@ -1,6 +1,4 @@
 #include "headers.h"
-
-
 // Function to find LCS length between two strings
 int lcs(const char *a, const char *b) {
     int n = strlen(a);
@@ -27,7 +25,12 @@ int lcs(const char *a, const char *b) {
     return result;
 }
 
-// Returns pointer to list entry with longest common subsequence
+/*
+@brief takes a string and a symbol table and gives the best guess for the closest symbol
+@param target the string misspelled word
+@param head the head of the symbol table linked list
+@return the best guess symbol
+*/
 struct symbol *spellchecker(const char *target,struct symbol *head) {
     struct symbol *best = NULL;
     int best_score = -1;

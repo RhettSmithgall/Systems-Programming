@@ -2,6 +2,11 @@
 
 char* directives[] = {"START","END","BYTE","WORD","RESB","RESW","RESR","EXPORTS"};
 
+/*
+@brief checks a string to see if its a sic assembly directive 
+@param token a string to check
+@return yes 1 its a directive or no 0 it isn't
+*/
 int isDirective(char* token) {
     //https://www.geeksforgeeks.org/c/length-of-array-in-c/
     //this works because of pointer trickery

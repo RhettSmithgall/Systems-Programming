@@ -1,4 +1,5 @@
 //a struct for a symbol table
+//its a linked list with more than one data in it's node
 struct symbol {
 	char name[7];
 	int address;
