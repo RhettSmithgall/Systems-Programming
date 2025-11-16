@@ -6,3 +6,5 @@ grade
 *.dbg
 *.exe
 *.obj
+*.schema
+*.config
