@@ -1,3 +1,4 @@
+<img width="1072" height="412" alt="sic5" src="https://github.com/user-attachments/assets/11c17b4d-10ae-48ed-b079-e6c7b4027747" />
 This project is a 2-pass SIC assembler. 
 
 An Assembler takes assembly code and converts it into object code, it's a crucial step in the process of a compiler to convert written program code into an executable. 
